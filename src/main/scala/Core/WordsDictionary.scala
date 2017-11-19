@@ -6,5 +6,6 @@ trait WordsDictionary {
 }
 
 object WordsDictionary {
-  def create(collection: Seq[String]): WordsDictionary = new NaiveWordsDictionary(collection)
+  def apply(collection: Seq[String]): WordsDictionary =
+    NaiveWordsDictionary(collection)
 }
