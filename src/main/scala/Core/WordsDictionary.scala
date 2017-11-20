@@ -7,5 +7,5 @@ trait WordsDictionary {
 
 object WordsDictionary {
   def apply(collection: Seq[String]): WordsDictionary =
-    NaiveWordsDictionary(collection)
+    TrieWordsDictionary(collection)
 }
