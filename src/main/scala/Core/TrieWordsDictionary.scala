@@ -1,21 +1,29 @@
 package Core
 
+/**
+  * A words dictionary realization on a trie
+  * @param trie the trie of the dictionary
+  */
 class TrieWordsDictionary(trie: Trie) extends WordsDictionary {
-  def this(words: Seq[String]) = {
-    this(words.foldLeft(Trie())((acc, i) => acc.add(i)))
-    println(this)
-  }
+
+  def this(words: Seq[String]) =
+    this(Trie(words))
 
   override def containsStringThatStartsWith(prefix: String): Boolean =
-    trie.findWord(prefix).isDefined
+    trie.findSubtrie(prefix).isDefined
 
   override def containsFull(fullString: String): Boolean =
-    trie.findWord(fullString) match {
+    trie.findSubtrie(fullString) match {
       case None => false
       case Some(end) => end.isWordEnd
     }
 }
 
 object TrieWordsDictionary {
+  /**
+    * Creates a trie words dictionary with the words
+    * @param words the words of the dictionary
+    * @return the constructed trie
+    */
   def apply(words: Seq[String]) = new TrieWordsDictionary(words)
 }

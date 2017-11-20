@@ -1,6 +1,11 @@
 package Core
 
-case class NaiveWordsDictionary(collection: Seq[String]) extends WordsDictionary {
+/**
+  * A naive realization of the words dictionary
+  * @param collection the words of the dictionary
+  */
+final case class NaiveWordsDictionary(collection: Seq[String]) extends WordsDictionary {
+
   def containsStringThatStartsWith(prefix: String): Boolean =
     collection.exists(_.startsWith(prefix))
 

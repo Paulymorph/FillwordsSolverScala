@@ -16,6 +16,12 @@ class TrieTest extends FlatSpec {
     assert(Trie().add("aaaaa") != null)
   }
 
+  it should "find no subtries" in {
+    assert(Trie().findSubtrie("a").isEmpty)
+    assert(Trie().findSubtrie("ab").isEmpty)
+    assert(Trie().findSubtrie("swfe").isEmpty)
+  }
+
   behavior of "Trie with one letter"
   val oneLetterTrie: Trie = Trie().add("a")
 
@@ -32,6 +38,16 @@ class TrieTest extends FlatSpec {
   it should "have next that is a word end" in {
     val candidate = oneLetterTrie.next('a').get
     assert(candidate.isWordEnd)
+  }
+
+  it should "find the 'a' subtrie" in {
+    assert(oneLetterTrie.findSubtrie("a").isDefined)
+  }
+
+  it should "not find other from the 'a' subtries" in {
+    assert(oneLetterTrie.findSubtrie("aa").isEmpty)
+    assert(oneLetterTrie.findSubtrie("ab").isEmpty)
+    assert(oneLetterTrie.findSubtrie("d").isEmpty)
   }
 
   behavior of "Trie with one word"
@@ -56,6 +72,17 @@ class TrieTest extends FlatSpec {
     val nextLevel = oneWordTrie.next('a').get
     assert(!nextLevel.isWordEnd)
     assert(nextLevel.next('b').get.isWordEnd)
+  }
+
+  it should "find the 'a' and 'ab' subtries" in {
+    assert(oneWordTrie.findSubtrie("a").isDefined)
+    assert(oneWordTrie.findSubtrie("ab").isDefined)
+  }
+
+  it should "not find other from the 'ab' subtries" in {
+    assert(oneWordTrie.findSubtrie("c").isEmpty)
+    assert(oneWordTrie.findSubtrie("abc").isEmpty)
+    assert(oneWordTrie.findSubtrie("av").isEmpty)
   }
 
   behavior of "Trie with several words"
@@ -85,5 +112,15 @@ class TrieTest extends FlatSpec {
 
     val abLevel = aLevel.next('b').get
     assert(abLevel.next('f').get.isWordEnd)
+  }
+
+  it should "find the subtries not in the trie" in {
+    assert(oneLetterTrie.findSubtrie("a").isDefined)
+  }
+
+  it should "find other from the 'a' word" in {
+    assert(oneLetterTrie.findSubtrie("aa").isEmpty)
+    assert(oneLetterTrie.findSubtrie("ab").isEmpty)
+    assert(oneLetterTrie.findSubtrie("d").isEmpty)
   }
 }
