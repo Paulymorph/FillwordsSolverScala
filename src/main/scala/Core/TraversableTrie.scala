@@ -1,6 +1,6 @@
 package Core
 
-class TraversableTrie(private var innerTrie: Trie) extends Trie {
+final case class TraversableTrie(private var innerTrie: Trie) extends Trie {
   private var route: List[Trie] = List()
   private var currentPosition: Trie = innerTrie
 
@@ -28,7 +28,8 @@ class TraversableTrie(private var innerTrie: Trie) extends Trie {
 
   override def edgesLetters = currentPosition.edgesLetters
 
-  def goUp() = {
-    (currentPosition, route) = (route.head, route.tail)
+  def goUp(): Unit = {
+    currentPosition = route.head
+    route = route.tail
   }
 }
