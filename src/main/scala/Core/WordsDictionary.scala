@@ -22,6 +22,6 @@ object WordsDictionary {
     * @param collection the words to add to the dictionary
     * @return the formed dictionary
     */
-  def apply(collection: Seq[String]): WordsDictionary =
+  def apply(collection: Iterable[String]): WordsDictionary =
     TrieWordsDictionary(collection)
 }

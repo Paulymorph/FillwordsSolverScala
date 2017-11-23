@@ -34,6 +34,12 @@ trait Trie {
     * @return the result of the merge
     */
   def merge(second: Trie): Trie
+
+  /**
+    * Get letters of the edges of the current root
+    * @return a list of edges' letters of the current root
+    */
+  def edgesLetters: Iterable[Char]
 }
 
 object Trie {
@@ -48,7 +54,7 @@ object Trie {
     * @param words the words the trie should include
     * @return a trie with the words
     */
-  def apply(words: Seq[String]): Trie =
+  def apply(words: Iterable[String]): Trie =
     words.foldLeft(Trie())((acc, i) => acc.add(i))
 }
 

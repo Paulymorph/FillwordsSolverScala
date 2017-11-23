@@ -23,7 +23,7 @@ class TrieTest extends FlatSpec {
   }
 
   behavior of "Trie with one letter"
-  val oneLetterTrie: Trie = Trie().add("a")
+  val oneLetterTrie: Trie = Trie(Seq("a"))
 
   it should "have next only one next element" in {
     assert(oneLetterTrie.next('a').isDefined)
@@ -50,8 +50,12 @@ class TrieTest extends FlatSpec {
     assert(oneLetterTrie.findSubtrie("d").isEmpty)
   }
 
+  it should "merge with empty trie" in {
+    assert(oneLetterTrie == (oneLetterTrie merge Trie()))
+  }
+
   behavior of "Trie with one word"
-  val oneWordTrie: Trie = Trie().add("ab")
+  val oneWordTrie: Trie = Trie(Seq("ab"))
 
   it should "have next only right next elements" in {
     assert(oneWordTrie.next('b').isEmpty)
@@ -85,8 +89,11 @@ class TrieTest extends FlatSpec {
     assert(oneWordTrie.findSubtrie("av").isEmpty)
   }
 
+
+
+
   behavior of "Trie with several words"
-  val severalWordsTrie: Trie = Trie().add("abf").add("ac").add("a")
+  val severalWordsTrie: Trie = Trie(Seq("abf", "ac", "a"))
 
   it should "have next only right next elements" in {
     assert(severalWordsTrie.next('b').isEmpty)
@@ -115,12 +122,23 @@ class TrieTest extends FlatSpec {
   }
 
   it should "find the subtries not in the trie" in {
-    assert(oneLetterTrie.findSubtrie("a").isDefined)
+    assert(severalWordsTrie.findSubtrie("a").isDefined)
   }
 
   it should "find other from the 'a' word" in {
-    assert(oneLetterTrie.findSubtrie("aa").isEmpty)
-    assert(oneLetterTrie.findSubtrie("ab").isEmpty)
-    assert(oneLetterTrie.findSubtrie("d").isEmpty)
+    assert(severalWordsTrie.findSubtrie("aa").isEmpty)
+    assert(severalWordsTrie.findSubtrie("abcd").isEmpty)
+    assert(severalWordsTrie.findSubtrie("d").isEmpty)
+  }
+
+  it should "merge with other tries correctly" in {
+    def checkMerge(seq: Iterable[String]) =
+      assert((severalWordsTrie merge Trie(seq)) == seq.foldLeft(severalWordsTrie)(_.add(_)))
+
+    checkMerge(Seq("a"))
+    checkMerge(Seq("g"))
+    checkMerge(Seq("ag", "abc", "srgddgdf"))
+    checkMerge(Seq("ag", "abc", "asdw", ""))
+    checkMerge(Seq("ag", "abc", "asdw", "ewr", "abf"))
   }
 }

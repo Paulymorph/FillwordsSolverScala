@@ -6,8 +6,9 @@ package Core
   */
 class TrieWordsDictionary(trie: Trie) extends WordsDictionary {
 
-  def this(words: Seq[String]) =
-    this(Trie(words))
+  def this(words: Iterable[String]) = {
+      this(Trie(words))
+    }
 
   override def containsStringThatStartsWith(prefix: String): Boolean =
     trie.findSubtrie(prefix).isDefined
@@ -25,5 +26,5 @@ object TrieWordsDictionary {
     * @param words the words of the dictionary
     * @return the constructed trie
     */
-  def apply(words: Seq[String]) = new TrieWordsDictionary(words)
+  def apply(words: Iterable[String]) = new TrieWordsDictionary(words)
 }
