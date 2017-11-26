@@ -18,7 +18,7 @@ final case class MapTrie(isWordEnd: Boolean = false, nextNodes: Map[Char, Trie] 
       case Some(nextNode) => nextNode.findSubtrie(word.tail)
     }
 
-  override def add(word: String): Trie =
+  override def add(word: String): MapTrie =
     word.length match {
       case 0 => this.copy(isWordEnd = true)
       case _ =>
@@ -54,5 +54,5 @@ final case class MapTrie(isWordEnd: Boolean = false, nextNodes: Map[Char, Trie] 
     newRoot.copy(nextNodes = newEdges)
   }
 
-  override def edgesLetters = nextNodes.keys
+  override def edgesLetters: Iterable[Char] = nextNodes.keys
 }

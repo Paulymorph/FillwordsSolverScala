@@ -4,9 +4,9 @@ class TraversableTrie(private var innerTrie: Trie) extends Trie {
   private var route: List[Trie] = List()
   private var currentPosition: Trie = innerTrie
 
-  override def isWordEnd = currentPosition.isWordEnd
+  override def isWordEnd: Boolean = currentPosition.isWordEnd
 
-  override def next(letter: Char) = {
+  override def next(letter: Char): Option[TraversableTrie] = {
 
     currentPosition.next(letter) match {
       case None => None
@@ -17,18 +17,20 @@ class TraversableTrie(private var innerTrie: Trie) extends Trie {
     }
   }
 
-  override def findSubtrie(word: String) = ???
+  override def findSubtrie(word: String): Option[Trie] = ???
 
-  override def add(word: String) = ???
+  override def add(word: String): TraversableTrie = ???
 
-  override def merge(second: Trie) = {
+  override def merge(second: Trie): TraversableTrie = {
     innerTrie = innerTrie merge second
     this
   }
 
-  override def edgesLetters = currentPosition.edgesLetters
+  override def edgesLetters: Iterable[Char] = currentPosition.edgesLetters
 
-  def goUp() = {
-    (currentPosition, route) = (route.head, route.tail)
+  def goUp(): TraversableTrie = {
+    currentPosition = route.head
+    route = route.tail
+    this
   }
 }
