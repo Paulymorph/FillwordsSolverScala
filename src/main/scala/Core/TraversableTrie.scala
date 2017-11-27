@@ -29,6 +29,7 @@ class TraversableTrie(private var innerTrie: Trie) extends Trie {
   override def edgesLetters = currentPosition.edgesLetters
 
   def goUp() = {
-    (currentPosition, route) = (route.head, route.tail)
+    currentPosition = route.head
+    route = route.tail
   }
 }
