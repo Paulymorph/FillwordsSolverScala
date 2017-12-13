@@ -1,5 +1,7 @@
 package Core
 
+import scala.collection.mutable.ListBuffer
+
 /**
   * A trie with map as a way to keep the next nodes
   *
@@ -70,7 +72,8 @@ trait EdgesModule {
   def letters: Iterable[Char]
 }
 
-final case class MapEdges(edges: Map[Char, Trie]) extends EdgesModule {
+
+final case class MapEdges(edges: Map[Char, Trie] = Map.empty) extends EdgesModule {
   override def add(edge: (Char, Trie)) = MapEdges(edges + edge)
 
   override def contains(letter: Char): Boolean = edges.contains(letter)
@@ -80,8 +83,18 @@ final case class MapEdges(edges: Map[Char, Trie]) extends EdgesModule {
   override def next(letter: Char): Option[Trie] = edges.get(letter)
 }
 
-final case class ListEdges(edges: List[(Char, Trie)]) extends EdgesModule {
+final case class ListEdges(edges: List[(Char, Trie)] = List.empty) extends EdgesModule {
   override def add(edge: (Char, Trie)) = ListEdges(edge :: edges)
+
+  override def contains(letter: Char): Boolean = edges.exists(edge => edge._1 == letter)
+
+  override def letters: Iterable[Char] = edges.map(_._1)
+
+  override def next(letter: Char): Option[Trie] = edges.find(_._1 == letter).map(_._2)
+}
+
+final case class ListBufferEdges(edges: ListBuffer[(Char, Trie)] = ListBuffer.empty) extends EdgesModule {
+  override def add(edge: (Char, Trie)) = ListBufferEdges(edges += edge)
 
   override def contains(letter: Char): Boolean = edges.exists(edge => edge._1 == letter)
 

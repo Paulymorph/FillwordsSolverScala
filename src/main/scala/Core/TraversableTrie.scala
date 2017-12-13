@@ -34,3 +34,8 @@ class TraversableTrie(private var innerTrie: Trie) extends Trie {
     this
   }
 }
+
+object TraversableTrie {
+  def apply(words: Iterable[String]) =
+    new TraversableTrie(Trie(words))
+}

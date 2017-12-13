@@ -3,17 +3,25 @@ package Benchmarks
 import java.io.File
 
 import Core._
+import org.scalameter._
 
 object TriesBenchmark extends App {
+  val standardConfig = config(
+    Key.exec.minWarmupRuns -> 5,
+    Key.exec.maxWarmupRuns -> 10,
+    Key.exec.benchRuns -> 10,
+  ) withWarmer (new Warmer.Default)
+
+  new TraversableTrieDictionary(Seq("asd", "sdf"))
+
   val dictFile = "./Dictionary/new_dict_without_yo_and_tire.txt"
   val file = io.Source.fromFile(new File(dictFile))
-  val words = file.getLines().toArray
-  val defName = "default map"
-  val defaultTrie = time(Trie(words), defName + " construction")
+  val words = file.getLines().take(5000).toArray
 
-  time(Trie(words), "heating the seq")
+  val defName = "default map"
 
   println("\n++++++++++++++++++++ Construction of tries ++++++++++++++++++++")
+  val defaultTrie = time(Trie(words), defName + " construction")
   val oldMapName = "old map trie"
   val oldMapTrie = time(words.foldLeft(Trie())((acc, i) => acc.add(i)), oldMapName)
   val mapName = "map trie"
@@ -22,7 +30,10 @@ object TriesBenchmark extends App {
   val arrTrie = time(ModularTrie(words, new ArrayEdges(_ - 'А', 33)), arrName + " construction")
   val listName = "list trie"
   val listTrie = time(ModularTrie(words, ListEdges(List())), listName + " construction")
+  val listBufferName = "list buffer trie"
+  val listBufferTrie = time(ModularTrie(words, ListBufferEdges()), listBufferName + " construction")
   val searchWords = words.take(1000)
+
 
   def testTrie(trie: Trie, name: String, search: Iterable[String]): Unit = {
     time(search.foreach(word => {
@@ -31,17 +42,12 @@ object TriesBenchmark extends App {
   }
 
   def time[R](block: => R, name: String = "Elapsed time"): R = {
-    var times: List[Long] = List()
-    val result = block
-    for {
-      i <- 1 to 9
-      t0 = System.nanoTime()
-      res = block // call-by-name
-      t1 = System.nanoTime()
-    } times = (t1 - t0) :: times
+    val last = standardConfig.measure({
+      block
+    })
 
-    println(s"$name: ${times.sum / 1e9} seconds")
-    result
+    println(s"$name: $last")
+    block
   }
 
   println("\n++++++++++++++++++++ Search on tries ++++++++++++++++++++")
@@ -50,4 +56,5 @@ object TriesBenchmark extends App {
   testTrie(mapTrie, mapName, searchWords)
   testTrie(arrTrie, arrName, searchWords)
   testTrie(listTrie, listName, searchWords)
+  testTrie(listBufferTrie, listBufferName, searchWords)
 }

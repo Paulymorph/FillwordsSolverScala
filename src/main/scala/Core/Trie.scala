@@ -47,7 +47,7 @@ object Trie {
     * Creates an empty trie
     * @return an empty trie
     */
-  def apply(): Trie = MapTrie()
+  def apply(): Trie = ModularTrie(nextNodes = MapEdges())
 
   /**
     * Creates a trie with the words
