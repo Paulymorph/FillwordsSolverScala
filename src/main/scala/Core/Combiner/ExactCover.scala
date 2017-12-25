@@ -4,15 +4,18 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 
-class ExactCover[T](inputSets: Seq[Set[T]]) {
-//  private val distinctValues: Set[T] = inputSets.flatten.toSet
-  private val distinctCount: Int = inputSets.flatten.toSet.size
+class ExactCover[T](input: Seq[Set[T]]) {
+  private val inputSets: Map[Int, Set[T]] = input.zipWithIndex.map(_.swap).toMap
+
+  private val distinctCount: Int = inputSets.values.flatten.toSet.size
+
   val columns: Map[T, Set[Int]] =
-    inputSets.
-      zipWithIndex.
-      flatMap { case (set, ind) => set.map(el => el -> ind) }.
-      groupBy(_._1).
-      map { case (ind, vect) => ind -> vect.map(_._2).toSet }
+    inputSets
+      .map { case (ind, set) => set.map(el => el -> ind)}
+      .reduce(_ ++ _)
+      .groupBy(_._1)
+      .mapValues(_.map(_._2))
+
 
 
   private def printChoice(lst: Iterable[Int], s: String = ""): Unit = {
@@ -25,7 +28,8 @@ class ExactCover[T](inputSets: Seq[Set[T]]) {
   private var isSolved = false
 
   def getSolutions: ListBuffer[Set[Int]] = {
-    println(columns)
+    println("inputSets: " + inputSets)
+    println("columns: " + columns)
     if (!isSolved)
       solve()
     allSolutions
@@ -51,8 +55,8 @@ class ExactCover[T](inputSets: Seq[Set[T]]) {
     //    println(leftColumns)
     //    println(leftColumnsSizesMin)
 
-//    if (leftColumnsSizesMin == 0)
-//      return
+    //    if (leftColumnsSizesMin == 0)
+    //      return
 
     val bestColumnIndex: Int = leftColumnsSizes.indexOf(leftColumnsSizesMin)
     val bestColumnElement: T = leftColumns.apply(bestColumnIndex)
