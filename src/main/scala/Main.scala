@@ -4,8 +4,8 @@ import Core.Combiner.ExactCover
 import Core._
 import Core.TableSolver.InterimStructures.{Table, Word}
 import Core.TableSolver._
-
 import org.scalameter._
+
 
 object Timer {
   private def printTime(s: String, beg: Long, end: Long): Unit = {
@@ -38,13 +38,17 @@ class Timer {
 
 object Main extends App {
 
-  def measureExecTime[T](func: () => T): T = {
-    var res: T = ???
-    val time: Quantity[Double] = withWarmer(new Warmer.Default) measure {
-      res = func()
+  def measureExecTime[T](func: => T): T = {
+    var res: Option[T] = None
+    val time: Quantity[Double] = config(
+      Key.exec.benchRuns -> 10,
+      Key.exec.maxWarmupRuns -> 10,
+      Key.verbose -> true
+    ) withWarmer (new Warmer.Default) measure {
+      res = Option(func)
     }
     println(s"Execution time: $time")
-    res
+    res.get
   }
 
   override def main(args: Array[String]): Unit = {
@@ -60,30 +64,50 @@ object Main extends App {
     val fileWords = SupportMethods.readFile(dictPath).toSet
     timer.tack("Read dictionary words")
 
-    val dict = new SetDictionary(fileWords)
+    //    val dict: WordsDictionary = new SetDictionary(fileWords)
 
-//    val dict = new TrieWordsDictionary(SupportMethods.readFile(dictPath).toSeq)
-//    val dict = new TraversableTrie(Trie(fileWords))
+    //    val dict = new TrieWordsDictionary(fileWords)
 
-    timer.tack(s"Created dictionary: ${dict.getClass.getName}")
+    val listOfDicts: List[Class[_ <: WordsDictionary]] =
+      List(classOf[SetDictionary], classOf[TrieWordsDictionary])
+    timer.tack("Created list of dicts")
 
-    val crawler = new TableCrawler(table, dict)
-    timer.tack("Created table crawler")
+    // !!!!!!!!!!!!!!!!!
+    val printWhileTesting = false
+    // !!!!!!!!!!!!!!!!!
 
-    val words: List[Word] = crawler.findWords().toList.filter(w => w.word.length > 2)
-    timer.tack("Found words in table")
+    listOfDicts.foreach { dictType: Class[_ <: WordsDictionary] =>
+      val dictName = dictType.getName
+      println(s"Start testing '$dictName'")
+      val res = measureExecTime({
+        val dict: WordsDictionary = dictType.getConstructors()(0).newInstance(fileWords).asInstanceOf[WordsDictionary]
+        if (printWhileTesting)
+          timer.tack(s"Created dictionary: ${dictName})")
+
+        val crawler = new TableCrawler(table, dict)
+        if (printWhileTesting)
+          timer.tack("Created table crawler")
+
+        val words: List[Word] = crawler.findWords().toList.filter(w => w.word.length > 2)
+        if (printWhileTesting)
+          timer.tack("Found words in table")
+      })
+    }
+
 
     //    printWords(words)
 
-    val wordsMap = words.zipWithIndex.map(_.swap).toMap
-    val wordsCoors = wordsMap.mapValues(x => x.coordinates.map(p => p.x * table.size + p.y).toSet)
-    val coverer = new ExactCover(wordsCoors)
-
-    timer.tack("Done some intermediate conversions")
-    val indices: Set[Set[Int]] = coverer.getSolutions
-    timer.tack("Combined words to a solid table")
-
-    //    printSolution(indices)
+    //    val wordsMap = words.zipWithIndex.map(_.swap).toMap
+    //    val wordsCoors = wordsMap.mapValues(x => x.coordinates.map(p => p.x * table.size + p.y).toSet)
+    //    timer.tack("Done some intermediate conversions")
+    //
+    //    val coverer = new ExactCover(wordsCoors)
+    //    timer.tack("Created coverer")
+    //
+    //    val indices: Set[Set[Int]] = coverer.getSolutions
+    //    timer.tack("Combined words to a solid table")
+    //
+    //    printSolution(words, indices)
   }
 
   def printWords(words: List[Word]): Unit = {

@@ -1,13 +1,13 @@
 package Core.TableSolver
 
-import Core.SetDictionary
+import Core.WordsDictionary
 import Core.TableSolver.InterimStructures.{Point, Table, Word}
 
 import scala.collection.immutable.HashSet
 import scala.collection.mutable.ListBuffer
 
 
-class TableCrawler(table: Table, dictionary: SetDictionary) {
+class TableCrawler(table: Table, dictionary: WordsDictionary) {
   private val neighbours = Table.generateNeighbours(table.size)
 
 
