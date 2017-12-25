@@ -21,11 +21,6 @@ class ExactCover[T](indexToSet: Map[Int, Set[T]]) {
   private def solve(leftIndicesRows: Set[Int] = indexToSet.keySet,
                     leftElemsColumns: Set[T] = elemToIndex.keySet,
                     inSolutionRows: Set[Int] = Set.empty): Unit = {
-
-//    println(f"\nLeft indices: ${leftIndicesRows.toSeq.sorted.mkString(", ")}")
-//    println(f"Left elements: ${leftElemsColumns.mkString(", ")}")
-//    println(f"InSolution: ${inSolutionRows.toSeq.mkString(", ")} = ${indexToSet.filterKeys(inSolutionRows.contains).values.flatten.mkString(", ")}")
-
     if (leftElemsColumns.isEmpty) {
       allSolutions += inSolutionRows
 //      println(f"!!! Solution: $inSolutionRows") // TODO Remove similar sets of solutions
@@ -37,12 +32,8 @@ class ExactCover[T](indexToSet: Map[Int, Set[T]]) {
     val (elem, indices) = leftElementsWithIndices.minBy(_._2.size)
 
 
-
-//    println(f"Chose: ($elem, $indices)")
-
     indices.foreach{x =>
       val indicesToDrop = indexToSet(x).flatMap(elInSet => elemToIndex(elInSet))
-//      print(f"\t chose $x index: ${indexToSet(x)}. Indices to drop $indicesToDrop\n")
       solve(leftIndicesRows -- indicesToDrop,
         (leftElemsColumns -- indexToSet(x)) - elem,
         inSolutionRows + x)
