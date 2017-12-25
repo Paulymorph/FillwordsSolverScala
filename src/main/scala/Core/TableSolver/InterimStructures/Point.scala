@@ -19,7 +19,6 @@ object Point {
     if (y < tableSize - 1)
       neighbours += new Point(x, y + 1)
 
-    //    println(x, y, "\t", neighbours.mkString(", "))
     neighbours.toList
   }
 }

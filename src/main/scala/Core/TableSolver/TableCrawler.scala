@@ -30,10 +30,9 @@ class TableCrawler(table: Table, dictionary: SetDictionary) {
     val currentVisited = lastVisited + currentPoint
 
 
-    if (dictionary.containsFull(currentWord)) {
-      //      println("NEW WORD:", currentWord, currentVisited.map(x => x + "" + table.get(x)).mkString(", "))
+    if (dictionary.containsFull(currentWord))
       result += Word(currentWord, currentVisited)
-    }
+
 
     val neighbs = neighbours(currentPoint)
     result ++= neighbs.map((neigb: Point) => {

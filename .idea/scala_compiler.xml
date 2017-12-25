@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ScalaCompilerConfiguration">
-    <profile name="SBT 1" modules="fillwordssolver,fillwordssolverscala">
+    <profile name="SBT 1" modules="fillwordssolver">
       <option name="postfixOps" value="true" />
     </profile>
+    <profile name="SBT 2" modules="fillwordssolverscala" />
   </component>
 </project>

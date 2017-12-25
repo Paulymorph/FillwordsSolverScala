@@ -1,82 +1,51 @@
 package Core.Combiner
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
+class ExactCover[T](indexToSet: Map[Int, Set[T]]) {
 
-class ExactCover[T](inputSets: Seq[Set[T]]) {
-//  private val distinctValues: Set[T] = inputSets.flatten.toSet
-  private val distinctCount: Int = inputSets.flatten.toSet.size
-  val columns: Map[T, Set[Int]] =
-    inputSets.
-      zipWithIndex.
-      flatMap { case (set, ind) => set.map(el => el -> ind) }.
+  val elemToIndex: Map[T, Set[Int]] =
+    indexToSet.
+      toList.
+      flatMap { case (ind, set) => set.map((_, ind)) }.
       groupBy(_._1).
-      map { case (ind, vect) => ind -> vect.map(_._2).toSet }
+      mapValues(_.map(_._2).toSet)
 
+  var allSolutions: mutable.HashSet[Set[Int]] = mutable.HashSet.empty
 
-  private def printChoice(lst: Iterable[Int], s: String = ""): Unit = {
-    println(s + " " + lst + " => " + lst.map(x => inputSets(x)).toList.flatten
-      + " = " + lst.toList.sorted.map(x => x + "->" + inputSets(x)).mkString(", "))
+  def getSolutions: Set[Set[Int]] = {
+    solve()
+    allSolutions.toSet
   }
 
-  private var allSolutions = ListBuffer[Set[Int]]()
+  private def solve(leftIndicesRows: Set[Int] = indexToSet.keySet,
+                    leftElemsColumns: Set[T] = elemToIndex.keySet,
+                    inSolutionRows: Set[Int] = Set.empty): Unit = {
 
-  private var isSolved = false
+//    println(f"\nLeft indices: ${leftIndicesRows.toSeq.sorted.mkString(", ")}")
+//    println(f"Left elements: ${leftElemsColumns.mkString(", ")}")
+//    println(f"InSolution: ${inSolutionRows.toSeq.mkString(", ")} = ${indexToSet.filterKeys(inSolutionRows.contains).values.flatten.mkString(", ")}")
 
-  def getSolutions: ListBuffer[Set[Int]] = {
-    println(columns)
-    if (!isSolved)
-      solve()
-    allSolutions
-  }
-
-
-  private def solve(inSolution: mutable.HashSet[Int] = new mutable.HashSet[Int],
-                    chosenColumns: mutable.HashSet[T] = new mutable.HashSet[T],
-                    chosenRows: mutable.HashSet[Int] = new mutable.HashSet[Int]): Unit = {
-
-    if (chosenColumns.size == distinctCount) {
-      allSolutions += inSolution.toSet
-      printChoice(inSolution, "\nSolution")
+    if (leftElemsColumns.isEmpty) {
+      allSolutions += inSolutionRows
+//      println(f"!!! Solution: $inSolutionRows") // TODO Remove similar sets of solutions
       return
     }
-    //    print("\nIn solution: " + inSolution + ", chosen cols: " + chosenColumns + ", chosen rows: " + chosenRows + "\n")
 
-    val leftColumns: Seq[T] = (columns.keySet -- chosenColumns).toSeq
-    val leftColumnsSizes: Seq[Int] = leftColumns.map(x => (columns(x) -- chosenRows).size)
-    val leftColumnsSizesMin: Int = leftColumnsSizes.min
-
-    //    printChoice(chosenRows, "Chosen rows:")
-    //    println(leftColumns)
-    //    println(leftColumnsSizesMin)
-
-//    if (leftColumnsSizesMin == 0)
-//      return
-
-    val bestColumnIndex: Int = leftColumnsSizes.indexOf(leftColumnsSizesMin)
-    val bestColumnElement: T = leftColumns.apply(bestColumnIndex)
-    val rowsOfBestColumn: Set[Int] = columns(bestColumnElement) -- chosenRows
-    //    println("Best index: " + bestColumnIndex + ", element: " + bestColumnElement + ", rowsOfBestColumn: " + rowsOfBestColumn)
+    // Drop used rows and elems
+    val leftElementsWithIndices: Map[T, Set[Int]] = elemToIndex.filterKeys(leftElemsColumns.contains).mapValues(_ & leftIndicesRows)
+    val (elem, indices) = leftElementsWithIndices.minBy(_._2.size)
 
 
-    rowsOfBestColumn.foreach { row =>
-      inSolution += row
-      chosenColumns ++= inputSets(row)
 
-      val intersectingSets: Set[Int] = inputSets(row).flatMap(el => columns(el))
+//    println(f"Chose: ($elem, $indices)")
 
-      //      println("With " + row + " intersect " + (intersectingSets - row))
-
-      chosenRows ++= intersectingSets
-
-      solve(inSolution, chosenColumns, chosenRows)
-
-      inSolution -= row
-      chosenRows --= intersectingSets
-      chosenColumns --= inputSets(row)
+    indices.foreach{x =>
+      val indicesToDrop = indexToSet(x).flatMap(elInSet => elemToIndex(elInSet))
+//      print(f"\t chose $x index: ${indexToSet(x)}. Indices to drop $indicesToDrop\n")
+      solve(leftIndicesRows -- indicesToDrop,
+        (leftElemsColumns -- indexToSet(x)) - elem,
+        inSolutionRows + x)
     }
   }
 }
-
-
