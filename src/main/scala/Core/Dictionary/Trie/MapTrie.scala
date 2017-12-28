@@ -1,7 +1,5 @@
 package Core.Dictionary.Trie
 
-;
-
 /**
   * A trie with map as a way to keep the next nodes
   *
