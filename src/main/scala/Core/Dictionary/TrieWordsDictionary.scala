@@ -1,13 +1,16 @@
-package Core
+package Core.Dictionary
+
+import Core.Dictionary.Trie.{Trie => _Trie}
 
 /**
   * A words dictionary realization on a trie
+  *
   * @param trie the trie of the dictionary
   */
-class TrieWordsDictionary(trie: Trie) extends WordsDictionary {
+class TrieWordsDictionary(trie: _Trie) extends WordsDictionary {
 
   def this(words: Iterable[String]) = {
-      this(Trie(words))
+    this(_Trie(words))
     }
 
   override def containsStringThatStartsWith(prefix: String): Boolean =

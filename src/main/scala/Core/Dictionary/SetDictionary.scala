@@ -1,4 +1,4 @@
-package Core
+package Core.Dictionary
 
 
 class SetDictionary(listOfWords: Set[String]) extends WordsDictionary {

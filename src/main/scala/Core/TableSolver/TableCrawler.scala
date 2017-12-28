@@ -1,6 +1,6 @@
 package Core.TableSolver
 
-import Core.SetDictionary
+import Core.Dictionary.SetDictionary
 import Core.TableSolver.InterimStructures.{Point, Table, Word}
 
 import scala.collection.immutable.HashSet

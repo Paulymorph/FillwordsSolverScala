@@ -1,4 +1,4 @@
-package Core
+package Core.Dictionary
 
 trait WordsDictionary {
   /**

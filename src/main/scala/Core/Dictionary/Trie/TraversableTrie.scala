@@ -1,6 +1,6 @@
-package Core
+package Core.Dictionary.Trie
 
-class TraversableTrie(private var innerTrie: Trie) extends Trie {
+class TraversableTrie(private val innerTrie: Trie) extends Trie {
   private var route: List[Trie] = List()
   private var currentPosition: Trie = innerTrie
 
@@ -17,13 +17,14 @@ class TraversableTrie(private var innerTrie: Trie) extends Trie {
     }
   }
 
-  override def findSubtrie(word: String): Option[Trie] = ???
+  override def findSubtrie(word: String): Option[TraversableTrie] =
+    currentPosition.findSubtrie(word).map(new TraversableTrie(_))
 
-  override def add(word: String): TraversableTrie = ???
+  override def add(word: String): TraversableTrie = new TraversableTrie(currentPosition.add(word))
 
   override def merge(second: Trie): TraversableTrie = {
-    innerTrie = innerTrie merge second
-    this
+    val merged = innerTrie merge second
+    new TraversableTrie(merged)
   }
 
   override def edgesLetters: Iterable[Char] = currentPosition.edgesLetters
@@ -33,9 +34,4 @@ class TraversableTrie(private var innerTrie: Trie) extends Trie {
     route = route.tail
     this
   }
-}
-
-object TraversableTrie {
-  def apply(words: Iterable[String]) =
-    new TraversableTrie(Trie(words))
 }

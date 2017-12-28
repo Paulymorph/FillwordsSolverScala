@@ -2,7 +2,8 @@ package Benchmarks
 
 import java.io.File
 
-import Core._
+import Core.Dictionary.Trie.Trie
+import Core.Dictionary.Trie._
 import org.scalameter._
 
 object TriesBenchmark extends App {
@@ -10,9 +11,9 @@ object TriesBenchmark extends App {
     Key.exec.minWarmupRuns -> 5,
     Key.exec.maxWarmupRuns -> 10,
     Key.exec.benchRuns -> 10,
-  ) withWarmer (new Warmer.Default)
+  ) withWarmer new Warmer.Default
 
-  new TraversableTrieDictionary(Seq("asd", "sdf"))
+  //  new MemoTraversableTrie(Seq("asd", "sdf"))
 
   val dictFile = "./Dictionary/new_dict_without_yo_and_tire.txt"
   val file = io.Source.fromFile(new File(dictFile))
@@ -23,15 +24,15 @@ object TriesBenchmark extends App {
   println("\n++++++++++++++++++++ Construction of tries ++++++++++++++++++++")
   val defaultTrie = time(Trie(words), defName + " construction")
   val oldMapName = "old map trie"
-  val oldMapTrie = time(words.foldLeft(Trie())((acc, i) => acc.add(i)), oldMapName)
+  val oldMapTrie = time(words.foldLeft(MapTrie())((acc, i) => acc.add(i)), oldMapName)
   val mapName = "map trie"
-  val mapTrie = time(ModularTrie(words, MapEdges(Map.empty)), mapName + " construction")
+  val mapTrie = time(ModularTrie(words)(MapEdgesFactory), mapName + " construction")
   val arrName = "array trie"
-  val arrTrie = time(ModularTrie(words, new ArrayEdges(_ - 'А', 33)), arrName + " construction")
+  val arrTrie = time(ModularTrie(words)(ArrayEdgesFactory(_ - 'А', 33)), arrName + " construction")
   val listName = "list trie"
-  val listTrie = time(ModularTrie(words, ListEdges(List())), listName + " construction")
+  val listTrie = time(ModularTrie(words)(ListEdgesFactory), listName + " construction")
   val listBufferName = "list buffer trie"
-  val listBufferTrie = time(ModularTrie(words, ListBufferEdges()), listBufferName + " construction")
+  val listBufferTrie = time(ModularTrie(words)(BufferListEdgesFactory), listBufferName + " construction")
   val searchWords = words.take(1000)
 
 

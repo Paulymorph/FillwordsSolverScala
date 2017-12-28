@@ -1,4 +1,4 @@
-package Core
+package Core.Dictionary.Trie
 
 trait Trie {
   /**
@@ -43,18 +43,9 @@ trait Trie {
 }
 
 object Trie {
-  /**
-    * Creates an empty trie
-    * @return an empty trie
-    */
-  def apply(): Trie = ModularTrie(nextNodes = MapEdges())
+  implicit val ef: EdgesFactory = MapEdgesFactory
 
-  /**
-    * Creates a trie with the words
-    * @param words the words the trie should include
-    * @return a trie with the words
-    */
-  def apply(words: Iterable[String]): Trie =
-    words.foldLeft(Trie())((acc, i) => acc.add(i))
+  def apply(words: Iterable[String]) = ModularTrie(words)
+
+  def apply(): Trie = this (Seq())
 }
-
