@@ -15,13 +15,3 @@ trait WordsDictionary {
     */
   def containsFull(fullString: String): Boolean
 }
-
-object WordsDictionary {
-  /**
-    * Creates a dictionary from the sequence of the words
-    * @param collection the words to add to the dictionary
-    * @return the formed dictionary
-    */
-  def apply(collection: Iterable[String]): WordsDictionary =
-    TrieWordsDictionary(collection)
-}

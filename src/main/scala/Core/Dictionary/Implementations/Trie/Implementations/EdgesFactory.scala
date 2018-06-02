@@ -1,4 +1,6 @@
-package Core.Dictionary.Trie
+package Core.Dictionary.Implementations.Trie.Implementations
+
+import Core.Dictionary.Implementations.Trie._
 
 trait EdgesFactory {
   def apply(): EdgesModule

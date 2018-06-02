@@ -1,4 +1,6 @@
-package Core.Dictionary.Trie
+package Core.Dictionary.Implementations.Trie.Implementations.Traversable
+
+import Core.Dictionary.Implementations.Trie.Trie
 
 class TraversableTrie(private val innerTrie: Trie) extends Trie {
   private var route: List[Trie] = List()

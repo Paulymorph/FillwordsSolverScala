@@ -15,9 +15,9 @@ object Table {
   def createVisitedMatrix(size: Int): Matrix[Boolean] = Array.ofDim(size, size)
 
   def generateNeighbours(tableSize: Int): Map[Point, Iterable[Point]] =
-    Iterator.range(0, tableSize).map(x =>
+    Iterator.range(0, tableSize).flatMap(x =>
       Iterator.range(0, tableSize).map(y =>
-        (new Point(x, y), getNeighbours(x, y, tableSize)))).flatten.toMap
+        new Point(x, y) -> getNeighbours(x, y, tableSize))).toMap
 }
 
 

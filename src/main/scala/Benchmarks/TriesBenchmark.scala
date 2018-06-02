@@ -2,45 +2,26 @@ package Benchmarks
 
 import java.io.File
 
-import Core.Dictionary.Trie.Trie
-import Core.Dictionary.Trie._
+import Core.Dictionary.Implementations.Trie.Implementations.{MapEdgesFactory, ModularTrie}
+import Core.Dictionary.Implementations.{SetDictionary, TrieWordsDictionary}
+import Core.Dictionary.WordsDictionary
 import org.scalameter._
 
-object TriesBenchmark extends App {
+import scala.collection.concurrent.TrieMap
+
+class LibTrieDict(trie: TrieMap[String, Boolean]) extends WordsDictionary {
+  override def containsStringThatStartsWith(prefix: String): Boolean = trie.contains(prefix)
+
+  override def containsFull(fullString: String): Boolean = trie.contains(fullString)
+}
+
+object TriesBenchmark {
   val standardConfig = config(
-    Key.exec.minWarmupRuns -> 5,
+    Key.exec.minWarmupRuns -> 10,
     Key.exec.maxWarmupRuns -> 10,
     Key.exec.benchRuns -> 10,
+    Key.exec.independentSamples -> 10
   ) withWarmer new Warmer.Default
-
-  //  new MemoTraversableTrie(Seq("asd", "sdf"))
-
-  val dictFile = "./Dictionary/new_dict_without_yo_and_tire.txt"
-  val file = io.Source.fromFile(new File(dictFile))
-  val words = file.getLines().take(5000).toArray
-
-  val defName = "default map"
-
-  println("\n++++++++++++++++++++ Construction of tries ++++++++++++++++++++")
-  val defaultTrie = time(Trie(words), defName + " construction")
-  val oldMapName = "old map trie"
-  val oldMapTrie = time(words.foldLeft(MapTrie())((acc, i) => acc.add(i)), oldMapName)
-  val mapName = "map trie"
-  val mapTrie = time(ModularTrie(words)(MapEdgesFactory), mapName + " construction")
-  val arrName = "array trie"
-  val arrTrie = time(ModularTrie(words)(ArrayEdgesFactory(_ - 'А', 33)), arrName + " construction")
-  val listName = "list trie"
-  val listTrie = time(ModularTrie(words)(ListEdgesFactory), listName + " construction")
-  val listBufferName = "list buffer trie"
-  val listBufferTrie = time(ModularTrie(words)(BufferListEdgesFactory), listBufferName + " construction")
-  val searchWords = words.take(1000)
-
-
-  def testTrie(trie: Trie, name: String, search: Iterable[String]): Unit = {
-    time(search.foreach(word => {
-      trie.findSubtrie(word)
-    }), name + " search")
-  }
 
   def time[R](block: => R, name: String = "Elapsed time"): R = {
     val last = standardConfig.measure({
@@ -51,11 +32,51 @@ object TriesBenchmark extends App {
     block
   }
 
-  println("\n++++++++++++++++++++ Search on tries ++++++++++++++++++++")
-  testTrie(defaultTrie, defName, searchWords)
-  testTrie(oldMapTrie, oldMapName, searchWords)
-  testTrie(mapTrie, mapName, searchWords)
-  testTrie(arrTrie, arrName, searchWords)
-  testTrie(listTrie, listName, searchWords)
-  testTrie(listBufferTrie, listBufferName, searchWords)
+  def testTrie(trie: WordsDictionary, name: String, search: Iterable[String]): Unit = {
+    time(search.foreach(word => {
+      trie.containsStringThatStartsWith(word)
+    }), name + " search")
+  }
+
+  def main(args: Array[String]): Unit = {
+    val dictFile = "./Dictionary/new_dict_without_yo_and_tire.txt"
+    val file = io.Source.fromFile(new File(dictFile))
+    val words = file.getLines().toArray
+
+    println("\n++++++++++++++++++++ Construction of tries ++++++++++++++++++++")
+    val defaultMapTrieParallel = time(
+      new TrieWordsDictionary(ModularTrie.parallelConctruct(words)),
+      "parallel map trie dictionary construction"
+    )
+    val defaultMapTrieSeqeuntial = time(
+      new TrieWordsDictionary(ModularTrie(words)(MapEdgesFactory)),
+      "cons trie dictionary construction"
+    )
+
+    val setDictionary = time(
+      new SetDictionary(words.toSet),
+      "set dictionary construction"
+    )
+
+
+    println("\n------------------Another time----------------------")
+    time(new TrieWordsDictionary(ModularTrie.parallelConctruct(words)), "parallel map trie dictionary construction")
+    time(new TrieWordsDictionary(ModularTrie(words)(MapEdgesFactory)), "cons map trie dictionary construction")
+    time(new SetDictionary(words.toSet), "set dictionary construction")
+
+    val searchWords = words ++ Seq("ываш", "шуграцшг", "приветик")
+    val libRes = searchWords.map(defaultMapTrieParallel.containsFull)
+    val libDef = searchWords.map(defaultMapTrieSeqeuntial.containsFull)
+    assert(libRes.sameElements(libDef))
+
+    println("\n++++++++++++++++++++ Search on tries ++++++++++++++++++++")
+    testTrie(defaultMapTrieParallel, "parallel map trie", searchWords)
+    testTrie(defaultMapTrieSeqeuntial, "cons map trie dictionary", searchWords)
+    testTrie(setDictionary, "set dictionary", searchWords)
+
+    println("\n------------------Another time----------------------")
+    testTrie(defaultMapTrieParallel, "parallel map trie", searchWords)
+    testTrie(defaultMapTrieSeqeuntial, "cons map trie dictionary", searchWords)
+    testTrie(setDictionary, "set dictionary", searchWords)
+  }
 }

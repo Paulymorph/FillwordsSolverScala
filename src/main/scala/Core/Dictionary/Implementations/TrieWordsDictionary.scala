@@ -1,6 +1,8 @@
-package Core.Dictionary
+package Core.Dictionary.Implementations
 
-import Core.Dictionary.Trie.{Trie => _Trie}
+import Core.Dictionary.Implementations.Trie.Implementations.{MapEdgesFactory, ModularTrie}
+import Core.Dictionary.Implementations.Trie.{Trie => _Trie}
+import Core.Dictionary.WordsDictionary
 
 /**
   * A words dictionary realization on a trie
@@ -10,8 +12,8 @@ import Core.Dictionary.Trie.{Trie => _Trie}
 class TrieWordsDictionary(trie: _Trie) extends WordsDictionary {
 
   def this(words: Iterable[String]) = {
-    this(_Trie(words))
-    }
+    this(ModularTrie(words)(MapEdgesFactory))
+  }
 
   override def containsStringThatStartsWith(prefix: String): Boolean =
     trie.findSubtrie(prefix).isDefined
@@ -26,6 +28,7 @@ class TrieWordsDictionary(trie: _Trie) extends WordsDictionary {
 object TrieWordsDictionary {
   /**
     * Creates a trie words dictionary with the words
+    *
     * @param words the words of the dictionary
     * @return the constructed trie
     */

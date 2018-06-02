@@ -1,13 +1,13 @@
 package Core.TableSolver
 
-import Core.Dictionary.SetDictionary
+import Core.Dictionary.WordsDictionary
 import Core.TableSolver.InterimStructures.{Point, Table, Word}
 
 import scala.collection.immutable.HashSet
 import scala.collection.mutable.ListBuffer
 
 
-class TableCrawler(table: Table, dictionary: SetDictionary) {
+class TableCrawler(table: Table, dictionary: WordsDictionary) {
   private val neighbours = Table.generateNeighbours(table.size)
 
 
@@ -15,11 +15,13 @@ class TableCrawler(table: Table, dictionary: SetDictionary) {
     (for {
       x <- Iterator.range(0, table.size)
       y <- Iterator.range(0, table.size)
-    } yield tryToFindWords(new Point(x, y), new HashSet[Point](), "")).reduce(_ ++ _).toSet
+    } yield tryToFindWords(new Point(x, y))).reduce(_ ++ _).toSet
   }
 
 
-  def tryToFindWords(currentPoint: Point, lastVisited: Set[Point], lastWord: String): ListBuffer[Word] = {
+  def tryToFindWords(currentPoint: Point,
+                     lastVisited: Set[Point] = HashSet.empty,
+                     lastWord: String = ""): ListBuffer[Word] = {
 
     var result = new ListBuffer[Word]()
 
@@ -29,11 +31,8 @@ class TableCrawler(table: Table, dictionary: SetDictionary) {
     val currentWord = lastWord + table.get(currentPoint)
     val currentVisited = lastVisited + currentPoint
 
-
-    if (dictionary.containsFull(currentWord)) {
-      //      println("NEW WORD:", currentWord, currentVisited.map(x => x + "" + table.get(x)).mkString(", "))
+    if (dictionary.containsFull(currentWord))
       result += Word(currentWord, currentVisited)
-    }
 
     val neighbs = neighbours(currentPoint)
     result ++= neighbs.map((neigb: Point) => {

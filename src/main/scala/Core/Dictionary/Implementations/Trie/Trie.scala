@@ -1,4 +1,4 @@
-package Core.Dictionary.Trie
+package Core.Dictionary.Implementations.Trie
 
 trait Trie {
   /**
@@ -40,12 +40,4 @@ trait Trie {
     * @return a list of edges' letters of the current root
     */
   def edgesLetters: Iterable[Char]
-}
-
-object Trie {
-  implicit val ef: EdgesFactory = MapEdgesFactory
-
-  def apply(words: Iterable[String]) = ModularTrie(words)
-
-  def apply(): Trie = this (Seq())
 }

@@ -1,5 +1,6 @@
-package Core.Dictionary
+package Core.Dictionary.Implementations
 
+import Core.Dictionary.WordsDictionary
 
 class SetDictionary(listOfWords: Set[String]) extends WordsDictionary {
   val prefixes: Set[String] = listOfWords.flatMap { word =>

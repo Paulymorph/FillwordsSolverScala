@@ -1,4 +1,6 @@
-package Core.Dictionary
+package Core.Dictionary.Implementations
+
+import Core.Dictionary.WordsDictionary
 
 /**
   * A naive realization of the words dictionary

@@ -1,13 +1,9 @@
-package Core.Dictionary.Trie
+package Core.Dictionary.Implementations.Trie.Implementations.Traversable
 
 class MemoTraversableTrie(root: TraversableTrie) extends TraversableTrie(root) {
 
   private var lastSearch: String = _
   private var lastSubtrie = root
-
-  //  def this(words: Iterable[String]) = {
-  //    this(TraversableTrie(words))
-  //  }
 
   override def findSubtrie(prefix: String): Option[TraversableTrie] = {
     val (nUps, route) = MemoTraversableTrie.upsNeeded(lastSearch, prefix)
