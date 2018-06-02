@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fillwordssolver.iml" filepath="$PROJECT_DIR$/.idea/modules/fillwordssolver.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fillwordssolver-build.iml" filepath="$PROJECT_DIR$/.idea/modules/fillwordssolver-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/fillwordssolverscala.iml" filepath="$PROJECT_DIR$/.idea/modules/fillwordssolverscala.iml" />
     </modules>
   </component>
 </project>
