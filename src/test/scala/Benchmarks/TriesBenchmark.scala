@@ -7,14 +7,6 @@ import Core.Dictionary.Implementations.{SetDictionary, TrieWordsDictionary}
 import Core.Dictionary.WordsDictionary
 import org.scalameter._
 
-import scala.collection.concurrent.TrieMap
-
-class LibTrieDict(trie: TrieMap[String, Boolean]) extends WordsDictionary {
-  override def containsStringThatStartsWith(prefix: String): Boolean = trie.contains(prefix)
-
-  override def containsFull(fullString: String): Boolean = trie.contains(fullString)
-}
-
 object TriesBenchmark {
   val standardConfig = config(
     Key.exec.minWarmupRuns -> 10,
@@ -39,8 +31,8 @@ object TriesBenchmark {
   }
 
   def main(args: Array[String]): Unit = {
-    val dictFile = "./Dictionary/new_dict_without_yo_and_tire.txt"
-    val file = io.Source.fromFile(new File(dictFile))
+    val dictFilename = args.headOption.getOrElse("./Dictionary/new_dict_without_yo_and_tire.txt")
+    val file = io.Source.fromFile(new File(dictFilename))
     val words = file.getLines().toArray
 
     println("\n++++++++++++++++++++ Construction of tries ++++++++++++++++++++")
@@ -48,21 +40,22 @@ object TriesBenchmark {
       new TrieWordsDictionary(ModularTrie.parallelConctruct(words)),
       "parallel map trie dictionary construction"
     )
+
     val defaultMapTrieSeqeuntial = time(
       new TrieWordsDictionary(ModularTrie(words)(MapEdgesFactory)),
       "cons trie dictionary construction"
     )
 
     val setDictionary = time(
-      new SetDictionary(words.toSet),
+      SetDictionary(words.toSet),
       "set dictionary construction"
     )
-
 
     println("\n------------------Another time----------------------")
     time(new TrieWordsDictionary(ModularTrie.parallelConctruct(words)), "parallel map trie dictionary construction")
     time(new TrieWordsDictionary(ModularTrie(words)(MapEdgesFactory)), "cons map trie dictionary construction")
-    time(new SetDictionary(words.toSet), "set dictionary construction")
+    time(SetDictionary(words.toSet), "set dictionary construction")
+
 
     val searchWords = words ++ Seq("ываш", "шуграцшг", "приветик")
     val libRes = searchWords.map(defaultMapTrieParallel.containsFull)

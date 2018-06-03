@@ -2,9 +2,12 @@ package Core.Dictionary.Implementations
 
 import Core.Dictionary.WordsDictionary
 
-class SetDictionary(listOfWords: Set[String]) extends WordsDictionary {
+case class SetDictionary(listOfWords: Set[String]) extends WordsDictionary {
   val prefixes: Set[String] = listOfWords.flatMap { word =>
-    Iterable.range(0, word.length + 1).map { number => word.substring(0, number) } // TODO How to use flatMap here?
+    Iterable.range(0, word.length + 1)
+      .map { prefixLength =>
+        word.substring(0, prefixLength)
+      }
   }
 
   override def containsStringThatStartsWith(prefix: String): Boolean = prefixes.contains(prefix)

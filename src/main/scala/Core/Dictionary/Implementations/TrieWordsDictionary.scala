@@ -1,7 +1,7 @@
 package Core.Dictionary.Implementations
 
 import Core.Dictionary.Implementations.Trie.Implementations.{MapEdgesFactory, ModularTrie}
-import Core.Dictionary.Implementations.Trie.{Trie => _Trie}
+import Core.Dictionary.Implementations.Trie.Trie
 import Core.Dictionary.WordsDictionary
 
 /**
@@ -9,7 +9,7 @@ import Core.Dictionary.WordsDictionary
   *
   * @param trie the trie of the dictionary
   */
-class TrieWordsDictionary(trie: _Trie) extends WordsDictionary {
+class TrieWordsDictionary(trie: Trie) extends WordsDictionary {
 
   def this(words: Iterable[String]) = {
     this(ModularTrie(words)(MapEdgesFactory))
@@ -19,10 +19,8 @@ class TrieWordsDictionary(trie: _Trie) extends WordsDictionary {
     trie.findSubtrie(prefix).isDefined
 
   override def containsFull(fullString: String): Boolean =
-    trie.findSubtrie(fullString) match {
-      case None => false
-      case Some(end) => end.isWordEnd
-    }
+    trie.findSubtrie(fullString)
+    .fold(false) (_.isWordEnd)
 }
 
 object TrieWordsDictionary {

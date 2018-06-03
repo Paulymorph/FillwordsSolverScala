@@ -1,5 +1,6 @@
 package Core.Dictionary.Implementations.Trie.Implementations
 
+import Core.Dictionary.Implementations.Trie.Implementations.EdgesContainers.MapEdges
 import Core.Dictionary.Implementations.Trie._
 
 import scala.concurrent.duration.Duration
@@ -12,55 +13,34 @@ import scala.concurrent.{Await, Future}
   * @param nextNodes a map of nodes that are on the next level of the trie
   */
 final case class ModularTrie(isWordEnd: Boolean = false,
-                             nextNodes: EdgesModule)
+                             nextNodes: EdgesContainer)
                             (implicit ef: EdgesFactory) extends Trie {
 
   override def findSubtrie(word: String): Option[Trie] =
-    if (word.isEmpty)
-      Some(this)
-    else next(word.head) match {
-      case None => None
-      case Some(nextNode) => nextNode.findSubtrie(word.tail)
+    word.toList match {
+      case firstLetter :: remainder =>
+        follow(firstLetter).flatMap(_.findSubtrie(remainder.mkString))
+      case _ => Some(this)
     }
 
-  override def next(letter: Char): Option[Trie] = nextNodes.next(letter)
+  override def follow(letter: Char): Option[Trie] = nextNodes.follow(letter)
 
-  override def add(word: String): ModularTrie =
-    word.length match {
-      case 0 => this.copy(isWordEnd = true)
-      case _ =>
-        val (nextLetter, left) = (word.head, word.tail)
+  override def +(word: String): ModularTrie =
+    word.headOption
+      .fold(this.copy(isWordEnd = true)) {
+        firstLetter =>
+          val edgeDestination = follow(firstLetter)
+            .getOrElse(ModularTrie(nextNodes = ef()))
 
-        next(nextLetter) match {
-          case None =>
-            val nextTrie = ModularTrie(nextNodes = ef()).add(left)
-            this.copy(nextNodes = nextNodes + (nextLetter -> nextTrie))
-          case Some(node) => this.copy(nextNodes = nextNodes + (nextLetter -> node.add(left)))
-        }
-    }
-
-  override def merge(second: Trie): ModularTrie = {
-    val newRoot = if (second.isWordEnd && !this.isWordEnd)
-      this.copy(isWordEnd = true)
-    else this
-
-    val newEdges = second.edgesLetters.foldLeft(nextNodes)((acc, letter) =>
-      if (acc.contains(letter)) {
-        val mergedNext = nextNodes.next(letter).get merge second.next(letter).get
-        acc + (letter -> mergedNext)
+          this.copy(nextNodes = nextNodes + Edge(firstLetter, edgeDestination + word.tail))
       }
-      else acc + (letter -> second.next(letter).get)
-    )
-
-    newRoot.copy(nextNodes = newEdges)
-  }
 
   override def edgesLetters: Iterable[Char] = nextNodes.letters
 }
 
 object ModularTrie {
   def apply(words: Iterable[String])(implicit ef: EdgesFactory): ModularTrie =
-    words.foldLeft(ModularTrie(isWordEnd = false, ef())(ef))((acc, i) => acc.add(i))
+    words.foldLeft(ModularTrie(isWordEnd = false, ef())(ef))((acc, i) => acc + i)
 
   def parallelConctruct(seq: Seq[String]): Trie = {
     import scala.concurrent.ExecutionContext.Implicits.global
@@ -76,6 +56,6 @@ object ModularTrie {
 
     val charToTrie = Await.result(charToTrieFut, Duration.Inf)
     val rootEdges = MapEdges(charToTrie.toMap)
-    ModularTrie(false, rootEdges)
+    ModularTrie(isWordEnd = false, rootEdges)
   }
 }

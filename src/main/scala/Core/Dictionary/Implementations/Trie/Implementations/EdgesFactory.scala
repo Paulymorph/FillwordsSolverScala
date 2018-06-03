@@ -1,9 +1,10 @@
 package Core.Dictionary.Implementations.Trie.Implementations
 
+import Core.Dictionary.Implementations.Trie.Implementations.EdgesContainers.{ArrayEdges, BufferListEdges, ListEdges, MapEdges}
 import Core.Dictionary.Implementations.Trie._
 
 trait EdgesFactory {
-  def apply(): EdgesModule
+  def apply(): EdgesContainer
 }
 
 object MapEdgesFactory extends EdgesFactory {

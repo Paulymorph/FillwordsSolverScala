@@ -12,7 +12,7 @@ trait Trie {
     * @param letter the letter to the subtrie
     * @return if exists Some of the subtrie by the letter, None otherwise
     */
-  def next(letter: Char): Option[Trie]
+  def follow(letter: Char): Option[Trie]
 
   /**
     * Finds the subtrie by the route of the word's letters
@@ -26,14 +26,7 @@ trait Trie {
     * @param word the word to add to the trie
     * @return a trie with the word added
     */
-  def add(word: String): Trie
-
-  /**
-    * Merges two tries
-    * @param second the second trie to merge with
-    * @return the result of the merge
-    */
-  def merge(second: Trie): Trie
+  def +(word: String): Trie
 
   /**
     * Get letters of the edges of the current root
