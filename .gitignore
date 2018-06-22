@@ -1,6 +1,5 @@
-*
-!/.gitignore
-!*.md
-!*.scala
-!*.conf
-!*.txt
+/.idea/
+/project/
+/target/
+*.class
+*.log
