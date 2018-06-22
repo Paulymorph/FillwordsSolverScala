@@ -7,6 +7,8 @@ import Core.Dictionary.Implementations.{SetDictionary, TrieWordsDictionary}
 import Core.Dictionary.WordsDictionary
 import org.scalameter._
 
+import scala.io.Source
+
 object TriesBenchmark {
   val standardConfig = config(
     Key.exec.minWarmupRuns -> 10,
@@ -32,7 +34,7 @@ object TriesBenchmark {
 
   def main(args: Array[String]): Unit = {
     val dictFilename = args.headOption.getOrElse("./Dictionary/new_dict_without_yo_and_tire.txt")
-    val file = io.Source.fromFile(new File(dictFilename))
+    val file = Source.fromFile(new File(dictFilename))
     val words = file.getLines().toArray
 
     println("\n++++++++++++++++++++ Construction of tries ++++++++++++++++++++")
