@@ -37,7 +37,7 @@ object TriesBenchmark {
 
     println("\n++++++++++++++++++++ Construction of tries ++++++++++++++++++++")
     val defaultMapTrieParallel = time(
-      new TrieWordsDictionary(ModularTrie.parallelConctruct(words)),
+      new TrieWordsDictionary(ModularTrie.parallelConstruct(words)),
       "parallel map trie dictionary construction"
     )
 
@@ -52,7 +52,7 @@ object TriesBenchmark {
     )
 
     println("\n------------------Another time----------------------")
-    time(new TrieWordsDictionary(ModularTrie.parallelConctruct(words)), "parallel map trie dictionary construction")
+    time(new TrieWordsDictionary(ModularTrie.parallelConstruct(words)), "parallel map trie dictionary construction")
     time(new TrieWordsDictionary(ModularTrie(words)(MapEdgesFactory)), "cons map trie dictionary construction")
     time(SetDictionary(words.toSet), "set dictionary construction")
 

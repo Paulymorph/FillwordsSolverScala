@@ -14,7 +14,7 @@ import scala.concurrent.{Await, Future}
   */
 final case class ModularTrie(isWordEnd: Boolean = false,
                              nextNodes: EdgesContainer)
-                            (implicit ef: EdgesFactory) extends Trie {
+                            (implicit edgesFactory: EdgesFactory) extends Trie {
 
   override def findSubtrie(word: String): Option[Trie] =
     word.toList match {
@@ -30,7 +30,7 @@ final case class ModularTrie(isWordEnd: Boolean = false,
       .fold(this.copy(isWordEnd = true)) {
         firstLetter =>
           val edgeDestination = follow(firstLetter)
-            .getOrElse(ModularTrie(nextNodes = ef()))
+            .getOrElse(ModularTrie(nextNodes = edgesFactory.emptyEdges()))
 
           this.copy(nextNodes = nextNodes + Edge(firstLetter, edgeDestination + word.tail))
       }
@@ -39,10 +39,12 @@ final case class ModularTrie(isWordEnd: Boolean = false,
 }
 
 object ModularTrie {
-  def apply(words: Iterable[String])(implicit ef: EdgesFactory): ModularTrie =
-    words.foldLeft(ModularTrie(isWordEnd = false, ef())(ef))((acc, i) => acc + i)
+  def apply(words: Iterable[String])(implicit edgesFactory: EdgesFactory): ModularTrie = {
+    val edgesContainer = edgesFactory.emptyEdges()
+    words.foldLeft(ModularTrie(isWordEnd = false, edgesContainer))((trie, word) => trie + word)
+  }
 
-  def parallelConctruct(seq: Seq[String]): Trie = {
+  def parallelConstruct(seq: Seq[String]): Trie = {
     import scala.concurrent.ExecutionContext.Implicits.global
     implicit val edgesFactory = MapEdgesFactory
     val charToTrieFut = Future.sequence(

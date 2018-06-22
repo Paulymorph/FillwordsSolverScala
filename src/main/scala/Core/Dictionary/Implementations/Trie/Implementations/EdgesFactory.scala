@@ -1,24 +1,23 @@
 package Core.Dictionary.Implementations.Trie.Implementations
 
 import Core.Dictionary.Implementations.Trie.Implementations.EdgesContainers.{ArrayEdges, BufferListEdges, ListEdges, MapEdges}
-import Core.Dictionary.Implementations.Trie._
 
 trait EdgesFactory {
-  def apply(): EdgesContainer
+  def emptyEdges(): EdgesContainer
 }
 
 object MapEdgesFactory extends EdgesFactory {
-  override def apply() = MapEdges()
+  override def emptyEdges() = MapEdges()
 }
 
 object ListEdgesFactory extends EdgesFactory {
-  override def apply() = ListEdges()
+  override def emptyEdges() = ListEdges()
 }
 
 object BufferListEdgesFactory extends EdgesFactory {
-  override def apply() = BufferListEdges()
+  override def emptyEdges() = BufferListEdges()
 }
 
 final case class ArrayEdgesFactory(hash: Char => Int, space: Int) extends EdgesFactory {
-  override def apply() = new ArrayEdges(hash, space)
+  override def emptyEdges() = new ArrayEdges(hash, space)
 }
